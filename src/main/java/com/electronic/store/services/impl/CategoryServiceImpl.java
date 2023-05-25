@@ -83,10 +83,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDto> searchCategory(String keywords) {
-        List<Category> filteredCategory = categoryRepository.findByCategoryTitleContaining(keywords);
-        List<CategoryDto> filteredCategoryDto = filteredCategory.stream().map(filterCategory -> entityToDto(filterCategory)).collect(Collectors.toList());
-        return filteredCategoryDto;
+    public PageableResponse<CategoryDto> searchCategory(int pageNumber, int pageSize, String sortBy, String sortDir,String keywords) {
+        Sort sort = (sortDir.equalsIgnoreCase("desc")) ? (Sort.by(sortBy).descending()) : (Sort.by(sortBy).ascending());
+        Pageable pageable = PageRequest.of(pageNumber,pageSize,sort);
+        Page<Category> page = categoryRepository.findByCategoryTitleContaining(pageable,keywords);
+        PageableResponse<CategoryDto> response = Helper.getPageableResponse(page, CategoryDto.class);
+        return response;
     }
 
 

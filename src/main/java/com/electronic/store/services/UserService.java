@@ -30,7 +30,7 @@ public interface UserService {
     public UserDto getUserByEmail(String email);
 
     //search user
-    public List<UserDto> searchUser(String keyword);
+    public PageableResponse<UserDto> searchUser(int pageNumber, int pageSize, String sortBy, String sortDir, String keyword);
 
     //other user related feature
 }

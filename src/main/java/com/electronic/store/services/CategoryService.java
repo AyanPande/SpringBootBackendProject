@@ -26,6 +26,6 @@ public interface CategoryService {
     public CategoryDto getCategoryById(String categoryId);
 
     //search category
-    public List<CategoryDto> searchCategory(String keywords);
+    public PageableResponse<CategoryDto> searchCategory(int pageNumber, int pageSize, String sortBy, String sortDir,String keywords);
 
 }

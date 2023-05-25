@@ -84,8 +84,13 @@ public class UserController {
     }
 
     @GetMapping("/search/{keywords}")
-    public ResponseEntity<List<UserDto>> searchUser(@PathVariable("keywords") String keywords) {
-        List<UserDto> searchUserDto = userService.searchUser(keywords);
+    public ResponseEntity<PageableResponse<UserDto>> searchUser(
+            @PathVariable("keywords") String keywords,
+            @RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = "name", required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir) {
+        PageableResponse<UserDto> searchUserDto = userService.searchUser(pageNumber,pageSize,sortBy,sortDir,keywords);
         return new ResponseEntity<>(searchUserDto, HttpStatus.OK);
     }
 
