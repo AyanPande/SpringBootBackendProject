@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.time.Instant;
 import java.util.Date;
 
 @Getter
@@ -32,7 +33,9 @@ public class Product {
     @Column(name = "product_quantity")
     private int productQuantity;
     @Column(name = "added_date")
-    private Date addedDate;
+    private Instant addedDate;
+    @Column(name = "updated_date")
+    private Instant updatedDate;
     @Column(name = "product_live")
     private boolean productLive;
     @Column(name = "product_stock")
