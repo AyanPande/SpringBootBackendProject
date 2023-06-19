@@ -1,15 +1,21 @@
 package com.electronic.store.controllers;
 
-import com.electronic.store.dtos.ApiResponseMessage;
-import com.electronic.store.dtos.PageableResponse;
-import com.electronic.store.dtos.ProductDto;
+import com.electronic.store.dtos.*;
+import com.electronic.store.services.FileService;
 import com.electronic.store.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
 
 @RestController
 @RequestMapping("/products")
@@ -17,6 +23,12 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private FileService fileService;
+
+    @Value("${product.profile.image.path}")
+    private String productImageUploadPath;
 
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@Valid @RequestBody ProductDto productDto) {
@@ -29,7 +41,7 @@ public class ProductController {
         return new ResponseEntity<>(updatedProductDto,HttpStatus.OK);
     }
     @DeleteMapping("/{productId}")
-    public ResponseEntity<ApiResponseMessage> deleteProduct(@PathVariable("productId") String productId) {
+    public ResponseEntity<ApiResponseMessage> deleteProduct(@PathVariable("productId") String productId) throws IOException {
         productService.deleteProduct(productId);
         ApiResponseMessage apiResponseMessage = ApiResponseMessage.builder().message("Product Deleted").success(true).status(HttpStatus.OK).build();
         return new ResponseEntity<>(apiResponseMessage,HttpStatus.OK);
@@ -67,5 +79,23 @@ public class ProductController {
             @PathVariable("productTitle") String productTitle) {
         PageableResponse<ProductDto> searchedProductDto = productService.searchProductByTitle(pageNumber, pageSize, sortBy, sortDir, productTitle);
         return new ResponseEntity<>(searchedProductDto,HttpStatus.OK);
+    }
+
+    @PostMapping("/image/{productId}")
+    public ResponseEntity<ImageResponseMessage> uploadProductCoverImage(@RequestParam("productImage") MultipartFile productImage, @PathVariable("productId") String productId) throws IOException {
+        String imageName = fileService.uploadFile(productImage, productImageUploadPath);
+        ProductDto productDto = productService.getSingleProduct(productId);
+        productDto.setProductImage(imageName);
+        ProductDto updatedProduct = productService.updateProduct(productDto, productId);
+        ImageResponseMessage imageResponseMessage = ImageResponseMessage.builder().imageName(imageName).imagePath(productImageUploadPath).message("Image Uploaded").success(true).status(HttpStatus.OK).build();
+        return new ResponseEntity<>(imageResponseMessage, HttpStatus.OK);
+    }
+
+    @GetMapping("/image/{productId}")
+    public void serveProductImage(@PathVariable("productId") String productId, HttpServletResponse response) throws IOException {
+        ProductDto productDto = productService.getSingleProduct(productId);
+        InputStream resource = fileService.getResource(productImageUploadPath, productDto.getProductImage());
+        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+        StreamUtils.copy(resource,response.getOutputStream());
     }
 }

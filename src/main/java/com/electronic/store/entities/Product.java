@@ -40,4 +40,6 @@ public class Product {
     private boolean productLive;
     @Column(name = "product_stock")
     private boolean productStock;
+    @Column(name = "product_image")
+    private String productImage;
 }

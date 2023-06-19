@@ -11,12 +11,17 @@ import com.electronic.store.repositories.ProductRepository;
 import com.electronic.store.services.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -27,6 +32,8 @@ public class ProductServiceImpl implements ProductService {
     private ModelMapper modelMapper;
     @Autowired
     private ProductRepository productRepository;
+    @Value("${product.profile.image.path}")
+    private String productImageUploadPath;
     @Override
     public ProductDto createProduct(ProductDto productDto) {
         String productId = UUID.randomUUID().toString();
@@ -50,15 +57,19 @@ public class ProductServiceImpl implements ProductService {
         product.setProductLive(productDto.isProductLive());
         product.setProductStock(productDto.isProductStock());
         product.setUpdatedDate(Instant.now());
+        product.setProductImage(productDto.getProductImage());
         Product updatedProduct = productRepository.save(product);
         ProductDto updatedProductDto = entityToDto(updatedProduct);
         return updatedProductDto;
     }
 
     @Override
-    public void deleteProduct(String productId) {
+    public void deleteProduct(String productId) throws IOException {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found!!"));
-        productRepository.delete(product);
+        String fullPath = productImageUploadPath  + product.getProductImage();
+        Path path = Paths.get(fullPath);
+        Files.delete(path);
+        productRepository.deleteById(productId);
     }
 
     @Override

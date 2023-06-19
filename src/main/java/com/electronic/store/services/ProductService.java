@@ -3,13 +3,15 @@ package com.electronic.store.services;
 import com.electronic.store.dtos.PageableResponse;
 import com.electronic.store.dtos.ProductDto;
 
+import java.io.IOException;
+
 public interface ProductService {
     //create
     public ProductDto createProduct(ProductDto productDto);
     //update
     public ProductDto updateProduct(ProductDto productDto, String productId);
     //delete
-    public void deleteProduct(String productId);
+    public void deleteProduct(String productId) throws IOException;
     //getSingleProduct
     public ProductDto getSingleProduct(String productId);
     //getAllProduct

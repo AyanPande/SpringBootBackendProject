@@ -27,4 +27,5 @@ public class ProductDto {
     private Instant updatedDate;
     private boolean productLive;
     private boolean productStock;
+    private String productImage;
 }
