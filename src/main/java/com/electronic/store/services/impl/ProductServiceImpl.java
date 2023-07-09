@@ -7,6 +7,7 @@ import com.electronic.store.entities.Category;
 import com.electronic.store.entities.Product;
 import com.electronic.store.exceptions.ResourceNotFoundException;
 import com.electronic.store.helper.Helper;
+import com.electronic.store.repositories.CategoryRepository;
 import com.electronic.store.repositories.ProductRepository;
 import com.electronic.store.services.ProductService;
 import org.modelmapper.ModelMapper;
@@ -32,13 +33,15 @@ public class ProductServiceImpl implements ProductService {
     private ModelMapper modelMapper;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
     @Value("${product.profile.image.path}")
     private String productImageUploadPath;
     @Override
     public ProductDto createProduct(ProductDto productDto) {
         String productId = UUID.randomUUID().toString();
-        productDto.setProductId(productId);
         Product product = dtoToEntity(productDto);
+        product.setProductId(productId);
         product.setAddedDate(Instant.now());
         product.setUpdatedDate(Instant.now());
         Product savedProduct = productRepository.save(product);
@@ -75,7 +78,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto getSingleProduct(String productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found!!"));
+        Category category = product.getCategory();
+        CategoryDto categoryDto = modelMapper.map(category, CategoryDto.class);
         ProductDto productDto = entityToDto(product);
+        productDto.setCategoryDto(categoryDto);
         return productDto;
     }
 
@@ -104,6 +110,22 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> page = productRepository.findByProductTitleContaining(pageable,keywords);
         PageableResponse<ProductDto> response = Helper.getPageableResponse(page, ProductDto.class);
         return response;
+    }
+
+    @Override
+    public ProductDto createProductWithCategory(ProductDto productDto, String categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found for particular categoryId"));
+        Product product = dtoToEntity(productDto);
+        String productId = UUID.randomUUID().toString();
+        product.setProductId(productId);
+        product.setAddedDate(Instant.now());
+        product.setUpdatedDate(Instant.now());
+        product.setCategory(category);
+        Product savedProduct = productRepository.save(product);
+        ProductDto savedProductDto = entityToDto(savedProduct);
+        CategoryDto categoryDto = modelMapper.map(category, CategoryDto.class);
+        savedProductDto.setCategoryDto(categoryDto);
+        return savedProductDto;
     }
 
     public Product dtoToEntity(ProductDto productDto) {

@@ -98,4 +98,10 @@ public class ProductController {
         response.setContentType(MediaType.IMAGE_JPEG_VALUE);
         StreamUtils.copy(resource,response.getOutputStream());
     }
+
+    @PostMapping("/categories/{categoryId}")
+    public ResponseEntity<ProductDto> createProductWithCategory(@Valid @RequestBody ProductDto productDto, @PathVariable("categoryId") String categoryId){
+        ProductDto productDtoWithCategory = productService.createProductWithCategory(productDto, categoryId);
+        return new ResponseEntity<>(productDtoWithCategory,HttpStatus.CREATED);
+    }
 }
