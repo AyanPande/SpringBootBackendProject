@@ -128,6 +128,31 @@ public class ProductServiceImpl implements ProductService {
         return savedProductDto;
     }
 
+    @Override
+    public ProductDto updateProductWithCategory(String productId, String categoryId) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product Not Found!!"));
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category Not Found"));
+        product.setCategory(category);
+        Product savedProduct = productRepository.save(product);
+        ProductDto savedProductDto = entityToDto(savedProduct);
+        CategoryDto categoryDto = modelMapper.map(category, CategoryDto.class);
+        savedProductDto.setCategoryDto(categoryDto);
+        return savedProductDto;
+    }
+
+    @Override
+    public PageableResponse<ProductDto> findProductByCategory(String categoryId, int pageNumber, int pageSize, String sortBy, String sortDir) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category Not Found"));
+        Sort sort = (sortDir.equalsIgnoreCase("desc")) ? (Sort.by(sortBy).descending()) : (Sort.by(sortBy).ascending());
+        Pageable pageable = PageRequest.of(pageNumber,pageSize,sort);
+        Page<Product> productsByCategory = productRepository.findByCategory(pageable, category);
+        PageableResponse<ProductDto> productsByCategoryResponse = Helper.getPageableResponse(productsByCategory, ProductDto.class);
+        for (ProductDto dto : productsByCategoryResponse.getContent()) {
+            dto.setCategoryDto(modelMapper.map(category, CategoryDto.class));
+        }
+        return productsByCategoryResponse;
+    }
+
     public Product dtoToEntity(ProductDto productDto) {
         return modelMapper.map(productDto, Product.class);
     }

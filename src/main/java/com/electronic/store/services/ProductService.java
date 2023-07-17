@@ -22,4 +22,8 @@ public interface ProductService {
     public PageableResponse<ProductDto> searchProductByTitle(int pageNumber, int pageSize, String sortBy, String sortDir, String keywords);
     //create product for a particular category
     public ProductDto createProductWithCategory(ProductDto productDto, String categoryId);
+    //update existing product with category
+    public ProductDto updateProductWithCategory(String productId, String categoryId);
+    //find products for a particular category
+    public PageableResponse<ProductDto> findProductByCategory(String categoryId, int pageNumber, int pageSize, String sortBy, String sortDir);
 }
