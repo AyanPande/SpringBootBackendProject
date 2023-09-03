@@ -68,7 +68,6 @@ public class CartServiceImpl implements CartService {
             Cart newCart = new Cart();
             newCart.setCreatedAt(Instant.now());
             newCart.setCartId(UUID.randomUUID().toString());
-            //List<CartItem> cartItemList = new ArrayList<>();
             List<CartItem> cartItemList = newCart.getCartItemList();
             if (ObjectUtils.isEmpty(cartItemList)) {
                 CartItem cartItem = CartItem.builder()
@@ -78,7 +77,6 @@ public class CartServiceImpl implements CartService {
                         .cart(newCart)
                         .build();
                 cartItemList.add(cartItem);
-                //newCart.setCartItemList(cartItemList);
                 newCart.setUser(user);
                 Cart savedCart = cartRepository.save(newCart);
                 CartDto savedCartDto = modelMapper.map(savedCart, CartDto.class);
@@ -112,7 +110,6 @@ public class CartServiceImpl implements CartService {
                         .cart(cart)
                         .build();
                 cartItems.add(cartItem);
-                //cart.setCartItemList(cartItems);
                 Cart saved = cartRepository.save(cart);
                 CartDto cartDto = modelMapper.map(saved, CartDto.class);
                 for (int i = 0; i < saved.getCartItemList().size(); i++){
@@ -125,7 +122,6 @@ public class CartServiceImpl implements CartService {
                 }
                 return cartDto;
             } else {
-                //cart.setCartItemList(cartItemList);
                 Cart saved1 = cartRepository.save(cart);
                 CartDto cartDto = modelMapper.map(saved1, CartDto.class);
                 for (int i = 0; i < saved1.getCartItemList().size(); i++){
