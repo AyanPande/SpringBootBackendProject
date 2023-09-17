@@ -1,5 +1,6 @@
 package com.electronic.store.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,6 +40,8 @@ public class Product {
     private boolean productStock;
     @Column(name = "product_image")
     private String productImage;
+
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;

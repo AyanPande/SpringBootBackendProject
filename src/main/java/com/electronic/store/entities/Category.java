@@ -1,4 +1,5 @@
 package com.electronic.store.entities;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -21,6 +22,8 @@ public class Category {
     private String categoryDescription;
     @Column(name = "category_cover_image")
     private String categoryCoverImage;
+
+    @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "category")
     private List<Product> productList;
 }
