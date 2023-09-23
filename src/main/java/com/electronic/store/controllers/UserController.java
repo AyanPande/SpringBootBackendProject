@@ -1,4 +1,4 @@
-package com.electronic.store.controllers
+package com.electronic.store.controllers;
 
 import com.electronic.store.dtos.ApiResponseMessage;
 import com.electronic.store.dtos.ImageResponseMessage;
