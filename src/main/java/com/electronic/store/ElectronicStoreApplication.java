@@ -8,10 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 public class ElectronicStoreApplication {
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
+	
 	public static void main(String[] args) {
 		SpringApplication.run(ElectronicStoreApplication.class, args);
 	}
